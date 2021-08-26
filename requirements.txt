@@ -1,0 +1,7 @@
+transformers==4.7.0
+torch==1.7.1
+pandas
+PyYAML
+nltk==3.5
+inflect
+#fuzzyset==0.0.19
