@@ -1,1 +1,2 @@
 conceptnet_en.tsv filter=lfs diff=lfs merge=lfs -text
+esnli_sample/ filter=lfs diff=lfs merge=lfs -text
