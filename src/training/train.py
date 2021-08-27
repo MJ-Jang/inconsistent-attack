@@ -23,7 +23,7 @@ def return_args():
     parser.add_argument('--task_type', type=str,  choices=['reverse'],
                         default='reverse',
                         help='type of task')
-    parser.add_argument('--data_directory', type=str, default='../../resources/esnli',
+    parser.add_argument('--data_directory', type=str, default='../../resources/esnli_sample',
                         help='directory where training/dev/test datasets are located')
     parser.add_argument('--save_dir', type=str, default='../../model_binary',
                         help='directory where trained model binary will be placed')

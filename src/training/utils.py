@@ -117,6 +117,7 @@ class BaseTrainDataset(Dataset, metaclass=abc.ABCMeta):
         self.eos_token_id = tokenizer.eos_token_id
         self.cross_entropy_ignore_index = -100
         self.save_cache = save_cache
+        self.tokenizer = tokenizer
 
         cached_features_file, data = self.load_data(directory, data_type, args)
         self.data = data
@@ -160,11 +161,11 @@ class BaseTrainDataset(Dataset, metaclass=abc.ABCMeta):
         del labels
         del expls
 
-        input_encode = tokenizer(inputs, truncation=True, padding=True)
+        input_encode = self.tokenizer(inputs, truncation=True, padding=True)
         del inputs
 
         print('Encoding inputs')
-        target_encode = tokenizer(targets, truncation=True, padding=True)
+        target_encode = self.tokenizer(targets, truncation=True, padding=True)
         del targets
         print('Encoding targets')
 

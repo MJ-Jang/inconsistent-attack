@@ -15,7 +15,7 @@
 - Usage example)
     ```bash
     cd src
-    bash train_rev_explainer.sh esnli ../resources/esnli_sample/ ../model_binary/
+    bash train_rev_explainer.sh 0 ../resources/esnli_sample/ ../model_binary/
     ```
     
 #### 2) Generate inconsistent explanations
