@@ -129,7 +129,7 @@ def main(args):
     }
 
     save_filename = f'inconsist-variables-{args.data_type}.json'
-    with open(os.path.join(args.save_dir, args.model_type, save_filename), 'w', encoding='utf-8') as saveFile:
+    with open(os.path.join(args.save_dir, save_filename), 'w', encoding='utf-8') as saveFile:
         json.dump(new_outp, saveFile)
 
 
