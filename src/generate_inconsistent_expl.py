@@ -87,7 +87,7 @@ def extract_instance(df: pd.DataFrame):
 
 def load_cn():
     dir_path = os.path.dirname(os.path.abspath(__file__))
-    cn_path = os.path.join(dir_path, '../resources/conceptnet_en.tsv')
+    cn_path = os.path.join(dir_path, '../resources/conceptnet_en_5.7.0.tsv')
     cn = pd.read_csv(cn_path, sep='\t')
 
     # Build search dictionary

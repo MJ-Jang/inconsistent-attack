@@ -2,7 +2,7 @@
 
 ### Installation
 - Please install required package in requirements.txt
-- Please install git lfs
+- Please install git lfs and pull
 
 
 ### Steps
@@ -35,7 +35,7 @@
 - Usage example)
     ```bash
     cd src
-    python generate_inconsistent_expl.py --data_dir ../resources/esnli_sample/ --save_dir ../resources/esnli/
+    python generate_inconsistent_expl.py --data_dir ../resources/esnli_sample/ --save_dir ../resources/esnli_sample/
     ```
 
 #### 3) Generate inconsistent variable parts by using ReverseExplainer
