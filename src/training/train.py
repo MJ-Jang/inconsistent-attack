@@ -20,6 +20,8 @@ def return_args():
     parser = argparse.ArgumentParser()
 
     # Required
+    parser.add_argument('--dataset', type=str,  choices=['esnli'],
+                        default='esnli',)
     parser.add_argument('--task_type', type=str,  choices=['reverse'],
                         default='reverse',
                         help='type of task')
@@ -106,7 +108,7 @@ def main(args):
     trainer = TrainOperator(**kwargs)
 
     # Run train
-    save_prefix = f"{args.model_type}-{args.task_type}"
+    save_prefix = f"{args.model_type}-{args.task_type}-{args.dataset}"
     trainer.run_train(args, save_prefix=save_prefix)
 
 
