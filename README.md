@@ -2,8 +2,10 @@
 
 ### Installation
 - Please install required package in requirements.txt
-- Please install git lfs and pull
-
+- Download conceptnet transformed file
+    ```bash
+    bash download_conceptnet_en.sh
+    ```
 
 ### Steps
 #### 1) Train reverse explainer
@@ -55,5 +57,5 @@
 - Usage example)
     ```bash
     cd src
-    python training/inference.py --data_dir ../resources/esnli_sample/ --save_dir ../resources/esnli/
+    bash generate_inconsistent_var.sh ../resources/esnli_sample/ ../resources/esnli_sample/
     ```

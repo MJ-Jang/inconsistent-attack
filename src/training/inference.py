@@ -19,11 +19,15 @@ from operators import BaseInferenceOperator
 from utils import InconsistVarGenDataset
 from typing import List, Dict, Text
 
+DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+
 
 def return_args():
     parser = argparse.ArgumentParser()
 
     # Required
+    parser.add_argument('--dataset', type=str,  choices=['esnli', 'cose1.0'],
+                        default='esnli',)
     parser.add_argument('--data_directory', type=str, default='../../resources/esnli',
                         help='directory where training/dev/test datasets are located')
     parser.add_argument('--save_dir', type=str, default='../../resources/esnli',
@@ -49,7 +53,7 @@ def load_model(args):
     tokenizer = T5TokenizerFast.from_pretrained(args.model_type)
     model = T5ForConditionalGeneration.from_pretrained(args.model_type, return_dict=True)
 
-    model_prefix = f"{args.model_type}-reverse.model"
+    model_prefix = f"{args.model_type}-reverse-{args.dataset}.model"
     try:
         model_path = os.path.join(args.model_directory, model_prefix)
         print(f"load model from {model_path}")

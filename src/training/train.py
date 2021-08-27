@@ -20,7 +20,7 @@ def return_args():
     parser = argparse.ArgumentParser()
 
     # Required
-    parser.add_argument('--dataset', type=str,  choices=['esnli'],
+    parser.add_argument('--dataset', type=str,  choices=['esnli', 'cose1.0'],
                         default='esnli',)
     parser.add_argument('--task_type', type=str,  choices=['reverse'],
                         default='reverse',
