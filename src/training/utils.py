@@ -261,7 +261,7 @@ class InconsistVarGenDataset(BaseTrainDataset):
         print(f"Input {inputs[0]}")
         del expls
 
-        input_encode = tokenizer(inputs, truncation=True, padding=True)
+        input_encode = self.tokenizer(inputs, truncation=True, padding=True)
         del inputs
         print('Encoding inputs')
 
