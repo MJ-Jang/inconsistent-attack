@@ -59,3 +59,27 @@
     cd src
     bash generate_inconsistent_var.sh ../resources/esnli_sample/ ../resources/esnli_sample/
     ```
+
+#### 4) Use generated variable part to make the model produce inconsistent explanations
+- Save the final generated output as *inconsist-final-test.json* and locate it in the same directory where *inconsist-expls-test.json* is located
+- File format of *inconsist-final-test.json* should be
+    - pair_id: key index for mapping
+    - context: context part (e.g. premise for NLI)
+    - variable: generated inconsistent variable part
+    - inconsist_expl: generated explanations with the inconsitent variables
+    - label: predicted labels
+    ```json
+     {
+        "pair_id": [...],
+        "context": [...],
+        "variable": [...],
+        "inconsist_expl": [...],
+        'label': [...]
+     }
+
+
+#### 5) Extract correct inconsistent explanations
+- The original test dataset is required to get the original label
+- See *test.tsv* file in **esnli_sample** folder to use the code without modification
+- If you used different format for the test data, modify the line 97-101 in *extract_inconsistent_expl.py* file
+
