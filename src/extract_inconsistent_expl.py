@@ -26,12 +26,12 @@ neg_patterns = re.compile(" not |Not | cannot | can't | isn't | doesn't | don't 
 def return_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dataset', type=str, default='esnli', choices=['esnli', 'cose1.0'])
+    parser.add_argument('--dataset', type=str, default='esnli_knownile', choices=['esnli', 'cose1.0', 'esnli_ve', 'esnli_nile'])
 
-    parser.add_argument('--data_dir', type=str, default='../resources/esnli_sample',
+    parser.add_argument('--data_dir', type=str, default='../resources/esnli_knownile',
                         help='directory path where inconsistent explanations for step 2 and step 4 are located')
 
-    parser.add_argument('--save_dir', type=str, default='../resources/esnli_sample',
+    parser.add_argument('--save_dir', type=str, default='../resources/esnli_knownile',
                         help='directory path to save the final results')
 
     parser.add_argument('--edit_dist_threshold', type=int, default=1,
@@ -98,8 +98,13 @@ def match_candidates(args) -> typing.Dict:
 
     # Load original label -------------------------------------------------------------------------
     # This part could be changed according to the file format of the original test data
-    original_data_df = pd.read_csv(os.path.join(args.data_dir, 'test.tsv'), sep='\t')
-    original_label = original_data_df['label'].tolist()
+    original_data_df = pd.read_csv(os.path.join(args.data_dir, 'test_data.csv'), sep=',')
+    original_label = original_data_df['gold_label'].tolist()
+    # test_ = []
+    # with open(os.path.join(args.data_dir, 'gen_test.json'), 'r', encoding='utf-8') as loadFile:
+    #     for line in loadFile:
+    #         test_.append(json.loads(line))
+    # original_label = [d['gt'] for d in test_]
     # ---------------------------------------------------------------------------------------------
 
     new_dict = {
@@ -164,10 +169,15 @@ def main(args):
 
     drop_idx = extract_both_neg_idx(output_df)
     output_df = output_df.drop(drop_idx).reset_index(drop=True)
+    output_df = output_df.drop_duplicates()
 
     save_filename = f"final_output.tsv"
     output_df.to_csv(os.path.join(args.save_dir, save_filename), sep='\t', index=False, encoding='utf-8')
     print(f"Total {len(output_df)} inconsistent explanations are extracted")
+
+    tmp_outp = output_df[["context", "original_variable", "original_label"]]
+    tmp_outp = tmp_outp.drop_duplicates()
+    print(f"# of unique successful attack data: {len(tmp_outp)}")
 
 
 if __name__ == '__main__':
