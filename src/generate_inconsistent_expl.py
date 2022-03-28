@@ -414,7 +414,7 @@ def main(args):
     if args.dataset == 'esnli':
         test_df = pd.read_csv(os.path.join(data_dir, f'reverse_test.tsv'), sep="\t")
     else:
-        test_df = pd.read_csv(os.path.join(data_dir, f'dev.tsv'), sep="\t")
+        test_df = pd.read_csv(os.path.join(data_dir, f'reverse_dev.tsv'), sep="\t")
 
     context_part, variable_part, generated_expl = split_text(test_df)
     pair_id = test_df['pairID'].tolist()
