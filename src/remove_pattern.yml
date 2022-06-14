@@ -1,0 +1,18 @@
+word-pair:
+  men:
+    - humans
+    - person
+  woman:
+    - person
+  people:
+    - person
+  flower:
+    - plant
+  politician:
+    - man
+  dog:
+    - cut
+  children:
+    - people
+  person:
+    - people
