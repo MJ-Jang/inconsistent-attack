@@ -12,6 +12,7 @@ __status__ = "Development"
 import re
 import json
 import os
+import yaml
 import argparse
 import pandas as pd
 import typing
@@ -26,12 +27,13 @@ neg_patterns = re.compile(" not |Not | cannot | can't | isn't | doesn't | don't 
 def return_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dataset', type=str, default='esnli_knownile', choices=['esnli', 'cose1.0', 'esnli_ve', 'esnli_nile'])
+    parser.add_argument('--dataset', type=str, default='esnli', choices=['esnli', 'cose1.0', 'esnli_ve', 'esnli_nile',
+                                                                           "cose_cage"])
 
-    parser.add_argument('--data_dir', type=str, default='../resources/esnli_knownile',
+    parser.add_argument('--data_dir', type=str, default='../resources/esnli_sample',
                         help='directory path where inconsistent explanations for step 2 and step 4 are located')
 
-    parser.add_argument('--save_dir', type=str, default='../resources/esnli_knownile',
+    parser.add_argument('--save_dir', type=str, default='../resources/esnli_sample',
                         help='directory path to save the final results')
 
     parser.add_argument('--edit_dist_threshold', type=int, default=1,
@@ -91,15 +93,24 @@ def match_candidates(args) -> typing.Dict:
             tags.append(expl_set['tags'][min_edit_idx])
 
     print(f"Total {len(extracted_idx)} inconsistent explanations are confirmed")
-    reverse_data_df = pd.read_csv(os.path.join(args.data_dir, 'reverse_test.tsv'), sep='\t')
+    if args.dataset == 'cose1.0':
+        reverse_data_df = pd.read_csv(os.path.join(args.data_dir, 'reverse_dev.tsv'), sep='\t')
+    else:
+        reverse_data_df = pd.read_csv(os.path.join(args.data_dir, 'reverse_test.tsv'), sep='\t')
     original_pair_id = reverse_data_df['pairID'].tolist()
     original_hypo = reverse_data_df['label'].tolist()
     original_expl = [s.split("Explanation:")[1].strip() for s in reverse_data_df['input'].tolist()]
 
     # Load original label -------------------------------------------------------------------------
     # This part could be changed according to the file format of the original test data
-    original_data_df = pd.read_csv(os.path.join(args.data_dir, 'test_data.csv'), sep=',')
-    original_label = original_data_df['gold_label'].tolist()
+    if 'esnli' in args.dataset:
+        original_data_df = pd.read_csv(os.path.join(args.data_dir, 'test.tsv'), sep='\t')
+        original_label = original_data_df['label'].tolist()
+    elif 'cose' in args.dataset:
+        original_data_df = pd.read_csv(os.path.join(args.data_dir, 'dev.csv'), sep=',')
+        original_label = original_data_df['label'].tolist()
+    else:
+        raise NotImplementedError
     # test_ = []
     # with open(os.path.join(args.data_dir, 'gen_test.json'), 'r', encoding='utf-8') as loadFile:
     #     for line in loadFile:
@@ -160,16 +171,60 @@ def extract_both_neg_idx(df: pd.DataFrame) -> typing.List:
     return outp
 
 
+# Extract human-filtered pattern index
+def extract_pattern_idx(df: pd.DataFrame, pattern_dict: typing.Dict) -> typing.List:
+    """
+    Returns index where replaced word is synonym or hypernym of the original word
+    Args:
+        df: pandas data frame
+        word_dict: dictionary of related words
+
+    Returns: list of index
+
+    """
+    outp = list()
+    original_expl = df['original_expl'].tolist()
+    reverse_expl = df['reverse_expl'].tolist()
+    tags = df['tags'].tolist()
+
+    word_pair_dict = pattern_dict['word-pair']
+
+    for i, (o_e, r_e, t) in tqdm(enumerate(zip(original_expl, reverse_expl, tags)), total=len(tags)):
+        if t == 'negation':
+            continue
+
+        o_e = o_e.split(" ")
+        r_e = r_e.split(" ")
+
+        try:
+            diff_idx = [j for j in range(len(o_e)) if o_e[j] != r_e[j]][0]
+            oe_word = o_e[diff_idx].replace(".", "").strip()
+            re_word = r_e[diff_idx].replace(".", "").strip()
+
+            word_list = word_pair_dict.get(oe_word)
+            if word_list and re_word in word_list:
+                outp.append(i)
+        except IndexError:
+            continue
+    return list(set(outp))
+
+
 def main(args):
     # 1. Extract inconsistent explanations using exact match (with edit distance threshold)
     output = match_candidates(args)
 
-    # 2. Filtering logic (remove if both explanations contain negative expressions)
+    # 2. Filtering logic (remove if both explanations contain negative expressions, human filter)
     output_df = pd.DataFrame(output)
 
     drop_idx = extract_both_neg_idx(output_df)
     output_df = output_df.drop(drop_idx).reset_index(drop=True)
     output_df = output_df.drop_duplicates()
+
+    with open('./remove_pattern.yml', 'r') as loadFile:
+        rm_pattern = yaml.load(loadFile, Loader=yaml.SafeLoader)
+
+    drop_idx = extract_pattern_idx(output_df, rm_pattern)
+    output_df = output_df.drop(drop_idx).reset_index(drop=True)
 
     save_filename = f"final_output.tsv"
     output_df.to_csv(os.path.join(args.save_dir, save_filename), sep='\t', index=False, encoding='utf-8')
