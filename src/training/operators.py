@@ -221,7 +221,12 @@ class BaseInferenceOperator:
             inputs['max_length'] = 100
 
             with torch.no_grad():
-                outp_ = self._model.generate(**inputs)
+                outp_ = self._model.generate(** inputs,
+                                             num_beams=5,
+                                             repetition_penalty=2.5,
+                                             length_penalty=1.0,
+                                             early_stopping=True
+                                             )
                 for o in outp_:
                     generated = self._tokenizer.decode(o, max_length=100)
                     generated = self.prepro_generated_sent(generated)
